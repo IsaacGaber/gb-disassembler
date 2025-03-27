@@ -29,7 +29,15 @@ public class Instruction {
     }
 
     public String toString(){
-        return String.format("%s %s %s", _mnemonic, _lOperand, _rOperand);
+        return  _mnemonic;
+    }
+    
+    public Operand getLOperand() {
+        return _lOperand;
+    }
+
+    public Operand getROperand() {
+        return _rOperand;
     }
 
     // @Override
