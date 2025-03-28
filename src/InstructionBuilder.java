@@ -8,7 +8,7 @@ import org.json.simple.parser.JSONParser;
 
 
 public class InstructionBuilder {
-    final static String OPCODES_PATH  = "src/data/Opcodes.json";
+    final static String OPCODES_PATH  = "opcodes/Opcodes.json";
 
     public static InstructionSet buildInstructions() {
         // System.out.println("Started Building Instructions");
