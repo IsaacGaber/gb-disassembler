@@ -12,20 +12,14 @@ public class Operand {
         this.BYTES = bytes;
     }
 
-    // Operand(String s, Map<String, Label> l) {
-    //     throw new UnsupportedOperationException("Unimplemented constructor");
-    // }
 
-    // Operand(OperandType o) {
-    //     _operandType = o;
-    //     // _data = null;    
-    // }
-
-    // Operand(OperandType o, Data d, boolean immediate) {
-    //     _operandType = o;
-    //     // _data = d;
-    //     _immediate = immediate;
-    // }
+    public boolean isRegister(){
+        return (OPERAND_TYPE != OperandType.N8 
+                || OPERAND_TYPE != OperandType.N16 
+                || OPERAND_TYPE != OperandType.A8 
+                || OPERAND_TYPE != OperandType.A16 
+                || OPERAND_TYPE != OperandType.E8);
+    }
 
     @Override
     public boolean equals(Object obj) {

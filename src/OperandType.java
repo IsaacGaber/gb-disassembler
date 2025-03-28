@@ -34,9 +34,9 @@ public enum OperandType{
     // //     this.bytes = byteLength;
     // // }
 
-    public static boolean isRegister(OperandType o){
-        return (o != N8 || o != N16 || o != A8 || o != A16 || o != E8);
-    }
+    // public static boolean isRegister(OperandType o){
+    //     return (o != N8 || o != N16 || o != A8 || o != A16 || o != E8);
+    // }
 
     public static OperandType intToOperand(int i) {
         if (((i >> 8) & 0xFF) != 0) {
