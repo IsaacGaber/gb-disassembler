@@ -100,14 +100,14 @@ public class Disassembler {
 
             Instruction[] currentInstructionSet = instructionSet.UNPREFIXED;
 
-            instruction = currentInstructionSet[b];
+            instruction = currentInstructionSet[Byte.toUnsignedInt(b)]; // find index -- have t
             
             switch (state) {
                 case State.READ_INSTRUCTION -> {
                     if (b == 0xCB && currentInstructionSet != instructionSet.CBPREFIXED) { // handle prefix
                         currentInstructionSet = instructionSet.CBPREFIXED;
-                    } else { // selects correct instruction mnemonic
-                        instruction = currentInstructionSet[b];
+                    } else { 
+                        // selects correct instruction mnemonic
                         // append instruction mnemonic to string builder
                         sb.append(instruction.toString().toLowerCase() + " "); 
                         // revert instruction set to unprefixed
@@ -119,14 +119,22 @@ public class Disassembler {
                         rOperand = instruction.getROperand();
                         // decide whether to switch state to reading data in each operand -- could definitely be made much more concise
                         // also inits operand lengths
+                        // TODO -- correctly format indirect and direct operands with [square brackets]
                         if (lOperand != null) {
                             lBytes = lOperand.BYTES;
                             if (lOperand.isRegister()) {
                                 sb.append(lOperand.OPERAND_TYPE.name().toLowerCase());
+                                if (lOperand.INCREMENT) {
+                                    sb.append("+");
+                                }
                                 if (rOperand != null) {
                                     rBytes = rOperand.BYTES;
                                     if (rOperand.isRegister()) {
-                                        sb.append(String.format(", %s\n", rOperand.OPERAND_TYPE.name().toLowerCase()));
+                                        sb.append(String.format(", %s", rOperand.OPERAND_TYPE.name().toLowerCase()));
+                                        if (rOperand.INCREMENT) {
+                                            sb.append("+");
+                                        }
+                                        sb.append('\n');
                                         state = State.READ_INSTRUCTION; 
                                     } else {
                                         state = State.READ_R_OPERAND;
@@ -147,10 +155,11 @@ public class Disassembler {
                 case State.READ_L_OPERAND -> { // read l Operand
                     if (lBytes > 0) {
                         // read left Operand as byte(s)
+                        sb.append(byteToHexstring(b));
                         lValue = (lValue << 8) | b; // shift lValue over, or b in 8 lowest bits
                         lBytes--;
                     } else { // done reading byte
-                        sb.append(String.format("$%04x\n".toUpperCase(), lBytes)); // convert value to 16-bit hex code
+                        sb.append(String.format("$%04x\n".toUpperCase(), lValue)); // convert value to 16-bit hex code
                         // read next instruction or next operand
                         if (rBytes > 0) {
                             state = State.READ_R_OPERAND;
@@ -165,11 +174,10 @@ public class Disassembler {
                         rValue = (rValue << 8) | b; // shift lValue over, or b in 8 lowest bits
                         rBytes--;
                     } else { // done reading byte
-                        sb.append(String.format("$%04x\n".toUpperCase(), rBytes)); // convert value to 16-bit hex code
+                        sb.append(String.format(", $%04x\n".toUpperCase(), rValue)); // convert value to 16-bit hex code
                         state = State.READ_INSTRUCTION;
                     }
                 } 
-                // default -> state = State.READ_INSTRUCTION;
             }
         }
 

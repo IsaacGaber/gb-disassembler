@@ -13,6 +13,8 @@ public enum OperandType{
     CD,
     EF,
     HL,
+    // program counter
+    PC,
     // stack pointer
     SP,
     // other operand types
@@ -65,6 +67,7 @@ public enum OperandType{
             case "ef" : return EF;
             case "hl" : return HL;
             case "sp" : return SP;
+            case "pc" : return PC;
             case "n8" : return N8;
             case "n16" : return N16;
             case "a8" : return A8;

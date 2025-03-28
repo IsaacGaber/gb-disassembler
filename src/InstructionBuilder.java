@@ -69,24 +69,35 @@ public class InstructionBuilder {
                     JSONObject jsonOperand = (JSONObject)jsonOperands.get(0);
                     String name = jsonOperand.get("name").toString();
                     Boolean immediate = Boolean.parseBoolean(jsonOperand.get("immediate").toString());
-
+                    Boolean increment = false;
+                    if (jsonOperand.containsKey("increment")) {
+                        increment = Boolean.parseBoolean(jsonOperand.get("increment").toString());
+                    }
                     int bytes = 0;
                     if (jsonOperand.containsKey("bytes")) {
                         bytes = Integer.parseInt(jsonOperand.get("bytes").toString());
                     }
-                    lOperand = new Operand(name, immediate, bytes);
+                    lOperand = new Operand(name, bytes, immediate, increment);
 
-                } else if (jsonOperands.size() > 1){
+                } 
+                
+                if (jsonOperands.size() > 1){
+                
                     JSONObject jsonOperand = (JSONObject)jsonOperands.get(1);
                     String name = jsonOperand.get("name").toString();
                     Boolean immediate = Boolean.parseBoolean(jsonOperand.get("immediate").toString());
-
+                    Boolean increment = false;
+                    if (jsonOperand.containsKey("increment")) {
+                        increment = Boolean.parseBoolean(jsonOperand.get("increment").toString());
+                    }
                     int bytes = 0;
                     if (jsonOperand.containsKey("bytes")) {
                         bytes = Integer.parseInt(jsonOperand.get("bytes").toString());
-                        System.out.println("R Operand created with size: " + bytes);
                     }
-                    rOperand = new Operand(name, immediate, bytes);
+                    // if (bytes != 0) {
+                    //     System.out.println(name + " has " + bytes + " bytes");
+                    // }
+                    rOperand = new Operand(name, bytes, immediate, increment);
                 }
 
                 // initialize new instruction object and add to map
