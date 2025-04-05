@@ -73,11 +73,11 @@ public class InstructionBuilder {
                     if (jsonOperand.containsKey("increment")) {
                         increment = Boolean.parseBoolean(jsonOperand.get("increment").toString());
                     }
-                    int bytes = 0;
-                    if (jsonOperand.containsKey("bytes")) {
-                        bytes = Integer.parseInt(jsonOperand.get("bytes").toString());
-                    }
-                    lOperand = new Operand(name, bytes, immediate, increment);
+                    // int bytes = 0;
+                    // if (jsonOperand.containsKey("bytes")) {
+                    //     bytes = Integer.parseInt(jsonOperand.get("bytes").toString());
+                    // }
+                    lOperand = new Operand(name, immediate, increment);
 
                 } 
                 
@@ -90,14 +90,14 @@ public class InstructionBuilder {
                     if (jsonOperand.containsKey("increment")) {
                         increment = Boolean.parseBoolean(jsonOperand.get("increment").toString());
                     }
-                    int bytes = 0;
-                    if (jsonOperand.containsKey("bytes")) {
-                        bytes = Integer.parseInt(jsonOperand.get("bytes").toString());
-                    }
+                    // int bytes = 0;
+                    // if (jsonOperand.containsKey("bytes")) {
+                    //     bytes = Integer.parseInt(jsonOperand.get("bytes").toString());
+                    // }
                     // if (bytes != 0) {
                     //     System.out.println(name + " has " + bytes + " bytes");
                     // }
-                    rOperand = new Operand(name, bytes, immediate, increment);
+                    rOperand = new Operand(name, immediate, increment);
                 }
 
                 // initialize new instruction object and add to map

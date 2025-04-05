@@ -13,7 +13,10 @@ import java.nio.ReadOnlyBufferException;
 import java.nio.file.FileSystemException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
+import java.lang.Byte;
 
 import javax.management.RuntimeErrorException;
 
@@ -43,16 +46,13 @@ public class Disassembler {
 
     }
 
-    public static String byteToHexstring(byte b){
-        return String.format("0x" + "%02x\n".toUpperCase(), b);
-    }
 
     public static void writeToHex(InputStream input, String fileName) {
         try {
             byte[] bytes = input.readAllBytes();
             FileWriter f = new FileWriter(fileName);
             for (byte b : bytes) {
-                f.write(byteToHexstring(b));
+                f.write(String.format("0x" + "%02x\n".toUpperCase(), b));
             }
         } catch (Exception e) {
             System.err.println("Could not write to file");
@@ -62,6 +62,7 @@ public class Disassembler {
 
     
 
+    @SuppressWarnings("null")
     public static String disassemble(InputStream input){
 
         InstructionSet instructionSet = InstructionBuilder.buildInstructions();
@@ -72,11 +73,12 @@ public class Disassembler {
             READ_R_OPERAND;
         }
 
-        byte[] bytes;
-
+        Queue<Byte> byteQueue = new LinkedList<>();
         try {
-            bytes = input.readAllBytes();
-
+            byte[] bytes = input.readAllBytes();
+            for (byte b : bytes) {
+                byteQueue.add(b);
+            }
         } catch (Exception e) {
             throw new RuntimeException("Could not read input stream: "+ input);
         }
@@ -85,102 +87,67 @@ public class Disassembler {
 
         State state = State.READ_INSTRUCTION; // start by reading right operand
 
-        System.out.println(bytes.length);
-        for (byte b : bytes) {
-            int lBytes = 0; // left operand byte length
-            int rBytes = 0; // right operand byte length
-            int lValue = 0; // value stored in left operand -- can be 8 or 16 bit
-            int rValue = 0; // value stored in right operand -- can be 8 or 16 bit
+        System.out.println(byteQueue.size());
+
+        while (!byteQueue.isEmpty()) {
+            byte b = byteQueue.remove();
+
+                int lByteLength = 0; // left operand byte length
+            int rByteLength = 0; // right operand byte length
             Operand lOperand = null;
             Operand rOperand = null;
 
-
             // System.out.println(byteToHexstring(b));
-        
-
+            
             Instruction[] currentInstructionSet = instructionSet.UNPREFIXED;
 
-            instruction = currentInstructionSet[Byte.toUnsignedInt(b)]; // find index -- have t
+            instruction = currentInstructionSet[Byte.toUnsignedInt(b)]; // find index of instruction
             
-            switch (state) {
-                case State.READ_INSTRUCTION -> {
-                    if (b == 0xCB && currentInstructionSet != instructionSet.CBPREFIXED) { // handle prefix
-                        currentInstructionSet = instructionSet.CBPREFIXED;
-                    } else { 
-                        // selects correct instruction mnemonic
-                        // append instruction mnemonic to string builder
-                        sb.append(instruction.toString().toLowerCase() + " "); 
-                        // revert instruction set to unprefixed
-                        if (currentInstructionSet == instructionSet.CBPREFIXED) {
-                            currentInstructionSet = instructionSet.UNPREFIXED;
-                        }
-                        // init operand lengths in bytes
-                        lOperand = instruction.getLOperand();
-                        rOperand = instruction.getROperand();
-                        // decide whether to switch state to reading data in each operand -- could definitely be made much more concise
-                        // also inits operand lengths
-                        // TODO -- correctly format indirect and direct operands with [square brackets]
-                        if (lOperand != null) {
-                            lBytes = lOperand.BYTES;
-                            if (lOperand.isRegister()) {
-                                sb.append(lOperand.OPERAND_TYPE.name().toLowerCase());
-                                if (lOperand.INCREMENT) {
-                                    sb.append("+");
-                                }
-                                if (rOperand != null) {
-                                    rBytes = rOperand.BYTES;
-                                    if (rOperand.isRegister()) {
-                                        sb.append(String.format(", %s", rOperand.OPERAND_TYPE.name().toLowerCase()));
-                                        if (rOperand.INCREMENT) {
-                                            sb.append("+");
-                                        }
-                                        sb.append('\n');
-                                        state = State.READ_INSTRUCTION; 
-                                    } else {
-                                        state = State.READ_R_OPERAND;
-                                    }
-                                } else {
-                                    sb.append("\n");
-                                    state = State.READ_INSTRUCTION;
-                                }
-                            } else {
-                                state = State.READ_L_OPERAND;
-                            }
-                        } else {                                // if no operands, then just read next instruction
-                            sb.append("\n");
-                            state = State.READ_INSTRUCTION;
-                        }
-                    }
+            if (b == 0xCB && currentInstructionSet != instructionSet.CBPREFIXED) { // handle prefix
+                currentInstructionSet = instructionSet.CBPREFIXED;
+            } else { 
+                // selects correct instruction mnemonic
+                // append instruction mnemonic to string builder
+                sb.append(instruction.toString().toLowerCase() + " "); 
+                // revert instruction set to unprefixed
+                if (currentInstructionSet == instructionSet.CBPREFIXED) {
+                    currentInstructionSet = instructionSet.UNPREFIXED;
                 }
-                case State.READ_L_OPERAND -> { // read l Operand
-                    if (lBytes > 0) {
-                        // read left Operand as byte(s)
-                        sb.append(byteToHexstring(b));
-                        lValue = (lValue << 8) | b; // shift lValue over, or b in 8 lowest bits
-                        lBytes--;
-                    } else { // done reading byte
-                        sb.append(String.format("$%04x\n".toUpperCase(), lValue)); // convert value to 16-bit hex code
-                        // read next instruction or next operand
-                        if (rBytes > 0) {
-                            state = State.READ_R_OPERAND;
-                        } else {
-                            state = State.READ_INSTRUCTION;
+                // process left operand first
+                lOperand = instruction.getLOperand();
+                if (lOperand != null) {
+                    if (!lOperand.isRegister()) {
+                        if (lOperand.byteLength() > 0 && !byteQueue.isEmpty()) {
+                            lOperand.data = Byte.toUnsignedInt(byteQueue.remove());
+                        }
+                        if (lOperand.byteLength() > 1 && !byteQueue.isEmpty()) {
+                            lOperand.data = lOperand.data << 8 | Byte.toUnsignedInt(byteQueue.remove()); // shift data over to left
+                        } else { 
+                            // throw new RuntimeException();
                         }
                     }
-                } 
-                case State.READ_R_OPERAND -> { //  read r Operand
-                    if (rBytes > 0) {
-                        // read left Operand as byte(s)
-                        rValue = (rValue << 8) | b; // shift lValue over, or b in 8 lowest bits
-                        rBytes--;
-                    } else { // done reading byte
-                        sb.append(String.format(", $%04x\n".toUpperCase(), rValue)); // convert value to 16-bit hex code
-                        state = State.READ_INSTRUCTION;
+                    sb.append(lOperand);
+                }
+                // then right operand
+                rOperand = instruction.getROperand();
+                if (rOperand != null) {
+                    if (!rOperand.isRegister()) {
+                        if (rOperand.byteLength() > 0 && !byteQueue.isEmpty()) {
+                            // int i = Byte.toUnsignedInt(b);
+                            rOperand.data = Byte.toUnsignedInt(byteQueue.remove());
+                        }
+                        if (rOperand.byteLength() > 1 && !byteQueue.isEmpty()) {
+                            rOperand.data = rOperand.data << 8 | Byte.toUnsignedInt(byteQueue.remove()); // shift data over to left
+                        } else { 
+                            // throw new RuntimeException();
+                        }
                     }
-                } 
+                    sb.append(", " + rOperand + '\n');
+                } else {
+                    sb.append('\n'); // if no operands, then just skip to next instruction
+                }
             }
-        }
-
+        } 
         return sb.toString();
     }
 }

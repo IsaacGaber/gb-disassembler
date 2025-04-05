@@ -9,9 +9,9 @@ public enum OperandType{
     H,
     L,
     // 16 bit registers
-    AB,
-    CD,
-    EF,
+    AF,
+    BC,
+    DE,
     HL,
     // program counter
     PC,
@@ -24,11 +24,11 @@ public enum OperandType{
     A16, // little-endian 16-bit address
     E8,  // 8-bit integer offset data
     // conditional codes
-    CC; // all conditional codes
-    // NZ, // execute if result of last operation not zero
-    // Z,  // execute if result of last operation is zero
-    // C,  // execute if result of last operation not Zero
-    // NC;
+    // CC; // all conditional codes
+    CC_NZ, // addition and subtraction
+    CC_Z, // zero
+    CC_C, // carry
+    CC_H; // half carry
 
     // public final int bytes;
 
@@ -62,9 +62,9 @@ public enum OperandType{
             case "f" : return F;
             case "h" : return H;
             case "l" : return L;
-            case "ab" : return AB;
-            case "cd" : return CD;
-            case "ef" : return EF;
+            case "af" : return AF;
+            case "bc" : return BC;
+            case "de" : return DE;
             case "hl" : return HL;
             case "sp" : return SP;
             case "pc" : return PC;
