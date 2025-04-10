@@ -5,14 +5,20 @@ import java.util.Scanner;
 import java.lang.Byte;
 
 public class Disassembler {
+    static final InstructionSet instructionSet = InstructionBuilder.buildInstructions();
+
     public static void main(String[] args) throws Exception {        
         Scanner in = new Scanner(System.in);
         FileInputStream input;
+        String outputName;
         // load file to disassemble 
+        // assumes file will be gameboy binary
         while (true) {
             try {
                 System.out.print("Input the path of the file you would like to disassemble: ");
                 input = new FileInputStream(in.nextLine());
+                System.out.print("Input the name of the output file: ");
+                outputName = in.nextLine();
                 in.close();
                 break;
             } catch (Exception e) {
@@ -21,8 +27,8 @@ public class Disassembler {
         }
 
         String disassembled = disassemble(input);
-        try (PrintWriter out = new PrintWriter("output.asm")) {
-            // write instructions
+        // write instructions
+        try (PrintWriter out = new PrintWriter(outputName)) {
             out.write(disassembled);
         }
         // writeToHex(input, "hello-world.txt");
@@ -48,7 +54,6 @@ public class Disassembler {
     @SuppressWarnings("null")
     public static String disassemble(InputStream input){
 
-        InstructionSet instructionSet = InstructionBuilder.buildInstructions();
         StringBuilder sb = new StringBuilder();
         enum State {
             READ_INSTRUCTION,
@@ -97,7 +102,7 @@ public class Disassembler {
                             lOperand.data = Byte.toUnsignedInt(byteQueue.remove());
                         }
                         if (lOperand.byteLength() > 1 && !byteQueue.isEmpty()) {
-                            lOperand.data = lOperand.data << 8 | Byte.toUnsignedInt(byteQueue.remove()); // shift data over to left
+                            lOperand.data = lOperand.data | Byte.toUnsignedInt(byteQueue.remove()) << 8 ; // shift data over to left
                         } else { 
                             // throw new RuntimeException();
                         }
@@ -112,7 +117,7 @@ public class Disassembler {
                             rOperand.data = Byte.toUnsignedInt(byteQueue.remove());
                         }
                         if (rOperand.byteLength() > 1 && !byteQueue.isEmpty()) {
-                            rOperand.data = rOperand.data << 8 | Byte.toUnsignedInt(byteQueue.remove()); // shift data over to left
+                            rOperand.data = rOperand.data | Byte.toUnsignedInt(byteQueue.remove()) << 8 ; // shift data over to left
                         } else { 
                             // throw new RuntimeException();
                         }

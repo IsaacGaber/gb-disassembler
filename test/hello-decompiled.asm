@@ -1,4 +1,3 @@
-; start header data
 nop 
 nop 
 nop 
@@ -255,12 +254,12 @@ nop
 nop 
 nop 
 nop 
-jp $5001
+jp $0150
 nop 
 adc a, $ed
 ld h, [hl]
 ld h, [hl]
-call z, $0d00
+call z, $000d
 dec bc
 inc bc
 ld [hl], e
@@ -271,12 +270,12 @@ inc c
 nop 
 dec c
 nop 
-ld [$111f], sp
+ld [$1f11], sp
 adc a, b
 adc a, c
 nop 
 ld c, $dc
-call z, $6ee6
+call z, $e66e
 illegal_dd 
 illegal_dd 
 reti 
@@ -287,7 +286,7 @@ ld h, a
 ld h, e
 ld l, [hl]
 ld c, $ec
-call z, $dddc
+call z, $dcdd
 sbc a, c
 sbc a, a
 cp a, e
@@ -323,18 +322,18 @@ ld [bc], a
 dec de
 ; EntryPoint:
 ld a, $00
-ld [$26ff], a
+ld [$ff26], a
 ; WaitVBlank:
-ld a, [$44ff]
+ld a, [$ff44]
 cp a, $90
-jp c, $5501
+jp c, $0155
 ; turn lcd off
 ld a, $00
-ld [$40ff], a
+ld [$ff40], a
 ; copy tile data
-ld de, $9301
-ld hl, $0090 ; number incorrect - bit shifting not working
-ld bc, $6004
+ld de, $0193
+ld hl, $9000 ; should be $9000, if not, then decompilation error occured
+ld bc, $0460
 ; CopyTiles:
 ld a, [de]
 ld [hli], a
@@ -342,10 +341,10 @@ inc de
 dec bc
 ld a, b
 or a, c
-jp nz, $6b01
-ld de, $f305
-ld hl, $0098
-ld bc, $4002
+jp nz, $016b
+ld de, $05f3
+ld hl, $9800
+ld bc, $0240
 ld a, [de]
 ; CopyTilemap:
 ld [hli], a
@@ -353,15 +352,15 @@ inc de
 dec bc
 ld a, b
 or a, c
-jp nz, $7d01
+jp nz, $017d
 ; turn on lcd
 ld a, $81
-ld [$40ff], a
+ld [$ff40], a
 ; init display registers
-ld a, $e4 ; equivalent to binary 11100100
-ld [$47ff], a
+ld a, $e4 ; should be equivalent to binary 11100100 - if not, then decompilation error occured
+ld [$ff47], a
 ; done, infinite loop
-jp $9001
+jp $0190
 ; Tiles: ; tile data section
 nop 
 rst 
@@ -414,13 +413,13 @@ ld a, [hl]
 nop 
 rst 
 nop 
-ld bc, $0001
+ld bc, $0100
 nop 
-ld bc, $0001
+ld bc, $0100
 nop 
-ld bc, $0001
+ld bc, $0100
 nop 
-ld bc, $00ff
+ld bc, $ff00
 nop 
 nop 
 nop 
@@ -480,7 +479,7 @@ inc bc
 nop 
 inc bc
 ld [bc], a
-ld bc, $0080
+ld bc, $8000
 nop 
 add a, b
 ld a, a
@@ -512,13 +511,13 @@ nop
 nop 
 nop 
 nop 
-ld bc, $0001
+ld bc, $0100
 rst 
-ld bc, $0001
-ld bc, $01fe
-ld bc, $ff01
+ld bc, $0100
+ld bc, $fe01
+ld bc, $01ff
 nop 
-ld bc, $0080
+ld bc, $8000
 add a, b
 add a, b
 ld a, a
@@ -559,7 +558,7 @@ xor a, d
 rst 
 ld d, l
 rst 
-ld a, [$07fd]
+ld a, [$fd07]
 rlca 
 ld [bc], a
 rlca 
@@ -628,13 +627,13 @@ ld a, [hl]
 ld a, [hli]
 ld a, [hl]
 ld [bc], a
-ld bc, $0001
+ld bc, $0100
 rst 
-ld bc, $0001
-ld bc, $01fe
-ld bc, $ff01
+ld bc, $0100
+ld bc, $fe01
+ld bc, $01ff
 nop 
-ld bc, $00ff
+ld bc, $ff00
 add a, b
 rst 
 ld d, b
@@ -682,13 +681,13 @@ ld a, [hl]
 xor a, e
 ld a, [hl]
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 ld a, a
 add a, b
 rst 
@@ -834,13 +833,13 @@ ld a, [hl]
 ld a, [hli]
 rst 
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $80ff
+ld bc, $ff80
 ld a, a
 add a, b
 rst 
@@ -874,9 +873,9 @@ nop
 ld a, [hli]
 rst 
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 cp a, $01
 cp a, $01
 cp a, $01
@@ -951,14 +950,14 @@ ld d, h
 ld a, [hl]
 nop 
 ld a, [hl]
-ld bc, $ff00
+ld bc, $00ff
 ld bc, $0101
 nop 
 ld bc, $0101
 nop 
 ld bc, $0101
 nop 
-ld bc, $54ff
+ld bc, $ff54
 xor a, [hl]
 ld hl, spi
 ld d, b
@@ -1000,7 +999,7 @@ rlca
 ld [bc], a
 inc bc
 inc bc
-ld bc, $0201
+ld bc, $0102
 ld d, h
 rst 
 add a, b
@@ -1024,10 +1023,10 @@ rra
 dec c
 rlca 
 ld b, $03
-ld bc, $0302
+ld bc, $0203
 ld bc, $0101
 nop 
-ld bc, $55ff
+ld bc, $ff55
 ld a, [hli]
 ld a, a
 ld d, l
@@ -1081,10 +1080,10 @@ rra
 dec c
 rlca 
 ld b, $03
-ld bc, $0302
-ld bc, $0301
+ld bc, $0203
+ld bc, $0103
 nop 
-ld bc, $54ff
+ld bc, $ff54
 xor a, b
 rst 
 ld d, h
@@ -1132,11 +1131,11 @@ nop
 nop 
 nop 
 nop 
-ld bc, $0001
+ld bc, $0100
 rst 
-ld bc, $0201
+ld bc, $0102
 rlca 
-ld bc, $fe03
+ld bc, $03fe
 illegal_fd 
 rlca 
 ld a, [bc]
@@ -1186,7 +1185,7 @@ nop
 rst 
 nop 
 rst 
-ld [$ef18], sp
+ld [$18ef], sp
 rst 
 nop 
 rst 
@@ -1211,9 +1210,9 @@ illegal_fd
 inc bc
 cp a, $01
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 push de
 ld a, [hl]
 xor a, e
@@ -1246,13 +1245,13 @@ ld a, [hl]
 ld a, [hli]
 rst 
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $fe01
+ld bc, $01fe
 rst 
-ld bc, $a2ff
+ld bc, $ffa2
 ld a, a
 ret nz
 cp a, a
@@ -1267,7 +1266,7 @@ illegal_fc
 xor a, d
 rst 
 rst 
-ld bc, $fc03
+ld bc, $03fc
 illegal_fd 
 inc bc
 illegal_fc 
@@ -1307,7 +1306,7 @@ ld b, c
 rst 
 add a, b
 rst 
-ld bc, $ff00
+ld bc, $00ff
 rst 
 ld d, h
 rst 
@@ -1337,15 +1336,15 @@ dec d
 rst 
 ld a, [bc]
 rst 
-ld bc, $ff00
+ld bc, $00ff
 rst 
-ld bc, $ff80
+ld bc, $80ff
 rst 
-ld bc, $ff80
+ld bc, $80ff
 rst 
-ld bc, $ff80
+ld bc, $80ff
 rst 
-ld bc, $ff00
+ld bc, $00ff
 rst 
 nop 
 nop 
@@ -1477,10 +1476,10 @@ nop
 nop 
 nop 
 nop 
-ld bc, $0203
-ld bc, $0403
-ld bc, $0500
-ld bc, $0500
+ld bc, $0302
+ld bc, $0304
+ld bc, $0005
+ld bc, $0005
 ld b, $04
 rlca 
 nop 
@@ -1500,13 +1499,13 @@ nop
 nop 
 nop 
 nop 
-ld [$090a], sp
+ld [$0a09], sp
 dec bc
 inc c
 dec c
 dec bc
 ld c, $0f
-ld [$0e0f], sp
+ld [$0f0e], sp
 stop $11
 ld [de], a
 inc de
@@ -1558,7 +1557,7 @@ nop
 nop 
 ld e, $1f
 jr nz, $00
-ld hl, $2223
+ld hl, $2322
 inc h
 ld [hli], a
 dec h
@@ -1583,7 +1582,7 @@ nop
 nop 
 nop 
 nop 
-ld bc, $2829
+ld bc, $2928
 ld a, [hli]
 dec hl
 inc l
@@ -1593,7 +1592,7 @@ ld l, $2d
 cpl 
 jr , $00
 dec l
-ld sp, $3233
+ld sp, $3332
 nop 
 nop 
 nop 
@@ -1610,13 +1609,13 @@ nop
 nop 
 nop 
 nop 
-ld [$340a], sp
+ld [$0a34], sp
 dec bc
-ld de, $0a0b
+ld de, $0b0a
 dec [hl]
 ld [hl], $0b
 ld c, $0f
-ld [$370a], sp
+ld [$0a37], sp
 jr c, $00
 nop 
 nop 
@@ -1667,8 +1666,8 @@ ld e, $3d
 ld a, $3f
 ld [hli], a
 daa 
-ld hl, $1f20
-ld hl, $2225
+ld hl, $201f
+ld hl, $2522
 ld e, $22
 ld b, b
 dec e

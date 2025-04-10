@@ -24,7 +24,7 @@ public class InstructionBuilder {
         Instruction[] cbprefixed = null;
         // Set<String> mnemonics = new HashSet<>();
 
-        // iteratre through both sets of Strings
+        // iterate through both sets of Strings
         for (int i = 0; i < 2; i++) {
             // loop setup
             Instruction[] instructions;
