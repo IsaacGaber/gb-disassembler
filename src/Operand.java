@@ -53,13 +53,6 @@ public class Operand {
         }
     }
 
-    private static String byteToHexstring(int b){
-        return String.format("$%02x", b);
-    }
-
-    private static String wordToHexstring(int w) {
-        return String.format("$%04x", w);
-    }
 
     // correctly format operand based on type and data
     public String toString() {
@@ -73,9 +66,9 @@ public class Operand {
             }
         } else {
             if (OPERAND_TYPE == OperandType.N8 || OPERAND_TYPE == OperandType.A8 || OPERAND_TYPE == OperandType.E8) { // to 8 bit values
-                str = byteToHexstring(data);
+                str = StringUtil.byteToHexstring(data);
             } else if (OPERAND_TYPE == OperandType.N16 || OPERAND_TYPE == OperandType.A16) {                          // to 16 bit values
-                str = wordToHexstring(data);
+                str = StringUtil.wordToHexstring(data);
             } else {
                 throw new TypeNotPresentException(OPERAND_TYPE.name(), null);
             }   

@@ -8,9 +8,36 @@ public class Disassembler {
     static final InstructionSet instructionSet = InstructionBuilder.buildInstructions();
 
     public static void main(String[] args) throws Exception {        
+        disassemble();
+        // for (Instruction instruction : instructionSet.UNPREFIXED) {
+        //     // if (instruction.toString().equals("illegal_dd")) {
+        //         System.out.println(instruction);
+        //     // }
+        // }
+        // writeToHex(input, "hello-world.txt");
+
+    }
+
+
+    public static void writeToHex(InputStream input, String fileName) {
+        try {
+            byte[] bytes = input.readAllBytes();
+            FileWriter f = new FileWriter(fileName);
+            for (byte b : bytes) {
+                f.write(String.format("0x" + "%02x\n".toUpperCase(), b));
+            }
+            f.close();
+        } catch (Exception e) {
+            System.err.println("Could not write to file");
+        }
+    }
+
+
+    public static void disassemble(){
         Scanner in = new Scanner(System.in);
         FileInputStream input;
         String outputName;
+
         // load file to disassemble 
         // assumes file will be gameboy binary
         while (true) {
@@ -26,40 +53,7 @@ public class Disassembler {
             }
         }
 
-        String disassembled = disassemble(input);
-        // write instructions
-        try (PrintWriter out = new PrintWriter(outputName)) {
-            out.write(disassembled);
-        }
-        // writeToHex(input, "hello-world.txt");
-
-    }
-
-
-    public static void writeToHex(InputStream input, String fileName) {
-        try {
-            byte[] bytes = input.readAllBytes();
-            FileWriter f = new FileWriter(fileName);
-            for (byte b : bytes) {
-                f.write(String.format("0x" + "%02x\n".toUpperCase(), b));
-            }
-        } catch (Exception e) {
-            System.err.println("Could not write to file");
-        }
-    }
-
-
-    
-
-    @SuppressWarnings("null")
-    public static String disassemble(InputStream input){
-
         StringBuilder sb = new StringBuilder();
-        enum State {
-            READ_INSTRUCTION,
-            READ_L_OPERAND,
-            READ_R_OPERAND;
-        }
 
         Queue<Byte> byteQueue = new LinkedList<>();
         try {
@@ -82,14 +76,13 @@ public class Disassembler {
             
             if (b == 0xCB && currentInstructionSet != instructionSet.CBPREFIXED) { // handle prefix
                 currentInstructionSet = instructionSet.CBPREFIXED;
+            } else if (!instruction.isValid()) {                                   // handle invalid opcodes -- write as data blocks
+                sb.append("db " + StringUtil.byteToHexstring(Byte.toUnsignedInt(b)) + "\n");
             } else { 
                 // selects correct instruction mnemonic
                 // append instruction mnemonic to string builder
                 sb.append(instruction.toString().toLowerCase() + " ");
-                if (instruction.toString().toLowerCase().equals("illegal_dd")) {
-                    // System.out.println("ILLEGAL DD");
-                    System.out.println(instruction);
-                }
+
                 // revert instruction set to unprefixed
                 if (currentInstructionSet == instructionSet.CBPREFIXED) {
                     currentInstructionSet = instructionSet.UNPREFIXED;
@@ -128,6 +121,13 @@ public class Disassembler {
                 }
             }
         } 
-        return sb.toString();
+        // write instructions
+        try (PrintWriter out = new PrintWriter(outputName)) {
+            out.write(sb.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Could not read write output: " + outputName);
+        }
     }
+    
+
 }

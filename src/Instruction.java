@@ -39,6 +39,14 @@ public class Instruction {
         return _rOperand;
     }
 
+    public boolean isValid() {
+        if (_mnemonic.length() >= 7) {
+            return !_mnemonic.substring(0, 7).equals("ILLEGAL"); 
+        } else {
+            return true;
+        }
+    }
+
     // @Override
     // public byte[] toBinary() {
     //     try {
