@@ -4,7 +4,7 @@ public class Operand {
     // public final int BYTE_LENGTH;
     public final boolean INCREMENT;
     public final boolean IMMEDIATE;
-    public int data;                // variable data held in operand only relevant for toString method
+    public int data;                // variable data held in operand only relevant for toString method -- length unchecked
 
     // init operand from string - used when building instruction set
     Operand(String s, boolean immediate,  boolean increment) {
@@ -14,14 +14,17 @@ public class Operand {
         this.INCREMENT = increment;
     }
 
-
-    public boolean isRegister(){
-        return (OPERAND_TYPE != null
-                && OPERAND_TYPE != OperandType.N8 
-                && OPERAND_TYPE != OperandType.N16 
-                && OPERAND_TYPE != OperandType.A8 
-                && OPERAND_TYPE != OperandType.A16 
-                && OPERAND_TYPE != OperandType.E8);
+    public boolean isData(){
+        return (OPERAND_TYPE != null 
+                && (OPERAND_TYPE == OperandType.N8 
+                || OPERAND_TYPE == OperandType.N16 
+                || OPERAND_TYPE == OperandType.A8 
+                || OPERAND_TYPE == OperandType.A16 
+                || OPERAND_TYPE == OperandType.E8));
+                // && OPERAND_TYPE != OperandType.CC_C
+                // && OPERAND_TYPE != OperandType.CC_H
+                // && OPERAND_TYPE != OperandType.CC_NZ
+                // && OPERAND_TYPE != OperandType.CC_Z);
     }
 
     public int byteLength(){
@@ -67,7 +70,7 @@ public class Operand {
         String str;
         if (OPERAND_TYPE == null) {
             str = "";
-        } else if (isRegister()) {
+        } else if (!isData()) {
             str = OPERAND_TYPE.name().toLowerCase();
             if (INCREMENT) {
                 str += '+';

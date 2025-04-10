@@ -259,7 +259,7 @@ nop
 adc a, $ed
 ld h, [hl]
 ld h, [hl]
-call , $0d00
+call z, $0d00
 dec bc
 inc bc
 ld [hl], e
@@ -275,7 +275,7 @@ adc a, b
 adc a, c
 nop 
 ld c, $dc
-call , $6ee6
+call z, $6ee6
 illegal_dd 
 illegal_dd 
 reti 
@@ -286,7 +286,7 @@ ld h, a
 ld h, e
 ld l, [hl]
 ld c, $ec
-call , $dddc
+call z, $dddc
 sbc a, c
 sbc a, a
 cp a, e
@@ -336,7 +336,7 @@ inc de
 dec bc
 ld a, b
 or a, c
-jp , $6b01
+jp nz, $6b01
 ld de, $f305
 ld hl, $0098
 ld bc, $4002
@@ -346,7 +346,7 @@ inc de
 dec bc
 ld a, b
 or a, c
-jp , $7d01
+jp nz, $7d01
 ld a, $81
 ld [$40ff], a
 ld a, $e4
@@ -449,14 +449,14 @@ ld hl, sp+
 nop 
 ldh a, [$00]
 ldh [$20], a
-ret 
+ret nz
 nop 
-ret 
+ret nz
 ld b, b
 add a, b
 nop 
 rst 
-ret 
+ret nz
 ccf 
 nop 
 rra 
@@ -897,11 +897,11 @@ cp a, $01
 add a, b
 rst 
 ccf 
-ret 
+ret nz
 ccf 
-ret 
+ret nz
 ccf 
-ret 
+ret nz
 rra 
 ldh [$1f], a
 ldh [$0f], a
@@ -953,9 +953,9 @@ ld hl, sp+
 ld d, b
 ldh a, [$a0]
 ldh [$60], a
-ret 
+ret nz
 add a, b
-ret 
+ret nz
 ld b, b
 add a, b
 ld b, b
@@ -1243,11 +1243,11 @@ ld bc, $fe01
 rst 
 ld bc, $a2ff
 ld a, a
-ret 
+ret nz
 cp a, a
-ret 
+ret nz
 ld a, a
-ret 
+ret nz
 cp a, a
 ldh [$5f], a
 ldh [$af], a
@@ -1546,7 +1546,7 @@ nop
 nop 
 nop 
 ld e, $1f
-jr , $00
+jr nz, $00
 ld hl, $2223
 inc h
 ld [hl+], a

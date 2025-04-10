@@ -1,34 +1,17 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOError;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.nio.ReadOnlyBufferException;
-import java.nio.file.FileSystemException;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.Files;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 import java.lang.Byte;
 
-import javax.management.RuntimeErrorException;
-
 public class Disassembler {
-    
     public static void main(String[] args) throws Exception {        
         Scanner in = new Scanner(System.in);
         FileInputStream input;
         // load file to disassemble 
         while (true) {
             try {
-                System.out.print("Input the path of the file you would like to compile: ");
+                System.out.print("Input the path of the file you would like to disassemble: ");
                 input = new FileInputStream(in.nextLine());
                 in.close();
                 break;
@@ -83,32 +66,25 @@ public class Disassembler {
             throw new RuntimeException("Could not read input stream: "+ input);
         }
 
-        Instruction instruction; // current instruction
-
-        State state = State.READ_INSTRUCTION; // start by reading right operand
-
-        System.out.println(byteQueue.size());
-
         while (!byteQueue.isEmpty()) {
             byte b = byteQueue.remove();
-
-                int lByteLength = 0; // left operand byte length
-            int rByteLength = 0; // right operand byte length
             Operand lOperand = null;
             Operand rOperand = null;
-
-            // System.out.println(byteToHexstring(b));
             
             Instruction[] currentInstructionSet = instructionSet.UNPREFIXED;
 
-            instruction = currentInstructionSet[Byte.toUnsignedInt(b)]; // find index of instruction
+            Instruction instruction = currentInstructionSet[Byte.toUnsignedInt(b)]; // find index of instruction
             
             if (b == 0xCB && currentInstructionSet != instructionSet.CBPREFIXED) { // handle prefix
                 currentInstructionSet = instructionSet.CBPREFIXED;
             } else { 
                 // selects correct instruction mnemonic
                 // append instruction mnemonic to string builder
-                sb.append(instruction.toString().toLowerCase() + " "); 
+                sb.append(instruction.toString().toLowerCase() + " ");
+                if (instruction.toString().toLowerCase().equals("illegal_dd")) {
+                    // System.out.println("ILLEGAL DD");
+                    System.out.println(instruction);
+                }
                 // revert instruction set to unprefixed
                 if (currentInstructionSet == instructionSet.CBPREFIXED) {
                     currentInstructionSet = instructionSet.UNPREFIXED;
@@ -116,7 +92,7 @@ public class Disassembler {
                 // process left operand first
                 lOperand = instruction.getLOperand();
                 if (lOperand != null) {
-                    if (!lOperand.isRegister()) {
+                    if (lOperand.isData()) {
                         if (lOperand.byteLength() > 0 && !byteQueue.isEmpty()) {
                             lOperand.data = Byte.toUnsignedInt(byteQueue.remove());
                         }
@@ -131,9 +107,8 @@ public class Disassembler {
                 // then right operand
                 rOperand = instruction.getROperand();
                 if (rOperand != null) {
-                    if (!rOperand.isRegister()) {
+                    if (rOperand.isData()) {
                         if (rOperand.byteLength() > 0 && !byteQueue.isEmpty()) {
-                            // int i = Byte.toUnsignedInt(b);
                             rOperand.data = Byte.toUnsignedInt(byteQueue.remove());
                         }
                         if (rOperand.byteLength() > 1 && !byteQueue.isEmpty()) {
@@ -144,7 +119,7 @@ public class Disassembler {
                     }
                     sb.append(", " + rOperand + '\n');
                 } else {
-                    sb.append('\n'); // if no operands, then just skip to next instruction
+                    sb.append('\n'); // if no operands at all, then just skip to next instruction
                 }
             }
         } 

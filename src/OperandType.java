@@ -25,20 +25,10 @@ public enum OperandType{
     E8,  // 8-bit integer offset data
     // conditional codes
     // CC; // all conditional codes
-    CC_NZ, // addition and subtraction
-    CC_Z, // zero
-    CC_C, // carry
-    CC_H; // half carry
-
-    // public final int bytes;
-
-    // // private OperandType(int byteLength) {
-    // //     this.bytes = byteLength;
-    // // }
-
-    // public static boolean isRegister(OperandType o){
-    //     return (o != N8 || o != N16 || o != A8 || o != A16 || o != E8);
-    // }
+    NZ, // addition and subtraction
+    Z; // zero
+    // CC_C, // carry
+    // CC_H; // half carry
 
     public static OperandType intToOperand(int i) {
         if (((i >> 8) & 0xFF) != 0) {
@@ -49,31 +39,10 @@ public enum OperandType{
     }
 
     public static OperandType stringToOperand(String s) {
-        if (s == null) {
+        try {
+            return OperandType.valueOf(s.toUpperCase());
+        } catch (Exception e) {
             return null;
         }
-        // System.out.println(s);
-        switch (s.toLowerCase()) {
-            case "a" : return A;
-            case "b" : return B;
-            case "c" : return C;
-            case "d" : return D;
-            case "e" : return E;
-            case "f" : return F;
-            case "h" : return H;
-            case "l" : return L;
-            case "af" : return AF;
-            case "bc" : return BC;
-            case "de" : return DE;
-            case "hl" : return HL;
-            case "sp" : return SP;
-            case "pc" : return PC;
-            case "n8" : return N8;
-            case "n16" : return N16;
-            case "a8" : return A8;
-            case "a16" : return A16;
-            case "e8" : return E8;
-            default: return null;
-        }    
     }
 }

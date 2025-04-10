@@ -2,8 +2,7 @@ public class Instruction {
     private final String _mnemonic;
     private final Operand _lOperand;
     private final Operand _rOperand;
-    // private final byte bytes;
-
+    
     // build instruction set -- used to get binary representation
     public static final InstructionSet instructionSet = InstructionBuilder.buildInstructions();
 

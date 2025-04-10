@@ -1,10 +1,6 @@
-import java.io.File;
-import java.io.FileReader;
-
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import java.io.*;
+import org.json.simple.*;
+import org.json.simple.parser.*;
 
 
 public class InstructionBuilder {
@@ -51,8 +47,6 @@ public class InstructionBuilder {
                 JSONObject jsonInstruction = (JSONObject) o.get(key);
                 // get attributes
                 String mnemonic = (String) jsonInstruction.get("mnemonic");
-                // add mnemonic to list of possible mnemonics if not already included
-                // mnemonics.add(mnemonic);
                 // read dictionary which holds the number of cycles instruciton takes
                 JSONArray jsonCycles = (JSONArray)jsonInstruction.get("cycles");
                 int[] cycles = new int[jsonCycles.size()];
