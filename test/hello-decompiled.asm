@@ -1,3 +1,4 @@
+; start header data
 nop 
 nop 
 nop 
@@ -320,18 +321,23 @@ nop
 rst 
 ld [bc], a
 dec de
+; EntryPoint:
 ld a, $00
 ld [$26ff], a
+; WaitVBlank:
 ld a, [$44ff]
 cp a, $90
 jp c, $5501
+; turn lcd off
 ld a, $00
 ld [$40ff], a
+; copy tile data
 ld de, $9301
-ld hl, $0090
+ld hl, $0090 ; number incorrect - bit shifting not working
 ld bc, $6004
+; CopyTiles:
 ld a, [de]
-ld [hl+], a
+ld [hli], a
 inc de
 dec bc
 ld a, b
@@ -341,17 +347,22 @@ ld de, $f305
 ld hl, $0098
 ld bc, $4002
 ld a, [de]
-ld [hl+], a
+; CopyTilemap:
+ld [hli], a
 inc de
 dec bc
 ld a, b
 or a, c
 jp nz, $7d01
+; turn on lcd
 ld a, $81
 ld [$40ff], a
-ld a, $e4
+; init display registers
+ld a, $e4 ; equivalent to binary 11100100
 ld [$47ff], a
+; done, infinite loop
 jp $9001
+; Tiles: ; tile data section
 nop 
 rst 
 nop 
@@ -445,7 +456,7 @@ rst
 inc bc
 illegal_fc 
 nop 
-ld hl, sp+
+ld hl, spi
 nop 
 ldh a, [$00]
 ldh [$20], a
@@ -486,11 +497,11 @@ nop
 add a, b
 nop 
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 push de
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 ld d, h
 ld a, [hl]
@@ -524,11 +535,11 @@ add a, b
 add a, b
 nop 
 ld a, a
-ld a, [hl+]
+ld a, [hli]
 ld a, a
 push de
 ld a, a
-ld a, [hl+]
+ld a, [hli]
 ld a, a
 ld d, l
 ld a, a
@@ -554,11 +565,11 @@ ld [bc], a
 rlca 
 nop 
 ld a, a
-ld a, [hl+]
+ld a, [hli]
 ld a, a
 push de
 ld a, a
-ld a, [hl+]
+ld a, [hli]
 ld a, a
 ld d, l
 ld a, a
@@ -566,7 +577,7 @@ xor a, d
 ld a, a
 push de
 ld a, a
-ld a, [hl+]
+ld a, [hli]
 ld a, a
 nop 
 rst 
@@ -614,7 +625,7 @@ xor a, e
 ld a, [hl]
 sub a, l
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 ld [bc], a
 ld bc, $0001
@@ -710,11 +721,11 @@ push de
 ld a, a
 xor a, d
 ld a, a
-ld hl, sp+
+ld hl, spi
 rlca 
-ld hl, sp+
+ld hl, spi
 rlca 
-ld hl, sp+
+ld hl, spi
 rlca 
 add a, b
 rst 
@@ -820,7 +831,7 @@ xor a, e
 ld a, [hl]
 push de
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 rst 
 rst 
 ld bc, $fe01
@@ -860,7 +871,7 @@ rst
 nop 
 rst 
 nop 
-ld a, [hl+]
+ld a, [hli]
 rst 
 rst 
 ld bc, $fe01
@@ -915,7 +926,7 @@ illegal_fc
 inc bc
 illegal_fd 
 inc bc
-ld hl, sp+
+ld hl, spi
 rlca 
 ld sp, hl
 rlca 
@@ -926,15 +937,15 @@ add a, d
 rst 
 ld d, l
 rst 
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 ld d, h
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 ld d, h
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 ld d, h
 ld a, [hl]
@@ -949,7 +960,7 @@ ld bc, $0101
 nop 
 ld bc, $54ff
 xor a, [hl]
-ld hl, sp+
+ld hl, spi
 ld d, b
 ldh a, [$a0]
 ldh [$60], a
@@ -1008,7 +1019,7 @@ nop
 add a, b
 ld d, l
 rst 
-ld a, [hl+]
+ld a, [hli]
 rra 
 dec c
 rlca 
@@ -1017,15 +1028,15 @@ ld bc, $0302
 ld bc, $0101
 nop 
 ld bc, $55ff
-ld a, [hl+]
+ld a, [hli]
 ld a, a
 ld d, l
 ld a, a
-ld a, [hl+]
+ld a, [hli]
 ld a, a
 ld d, l
 ld a, a
-ld a, [hl+]
+ld a, [hli]
 ld a, a
 ld d, l
 ld a, a
@@ -1090,11 +1101,11 @@ nop
 rst 
 nop 
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 push de
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 ld d, h
 ld a, [hl]
@@ -1102,15 +1113,15 @@ xor a, e
 halt 
 illegal_dd 
 ld h, [hl]
-ld [hl+], a
+ld [hli], a
 ld h, [hl]
 nop 
 ld a, h
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 push de
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 ld d, h
 ld a, h
@@ -1132,11 +1143,11 @@ ld a, [bc]
 rrca 
 nop 
 ld a, h
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 push de
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 ld d, h
 ld a, [hl]
@@ -1144,7 +1155,7 @@ xor a, e
 ld a, [hl]
 push de
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 ld a, [hl]
 nop 
 rst 
@@ -1232,7 +1243,7 @@ ld a, $ab
 ld a, [hl]
 push de
 ld a, [hl]
-ld a, [hl+]
+ld a, [hli]
 rst 
 rst 
 ld bc, $fe01
@@ -1270,15 +1281,15 @@ add a, d
 rst 
 ld d, l
 rst 
-ld a, [hl+]
+ld a, [hli]
 rst 
 ld d, l
 rst 
-ld a, [hl+]
+ld a, [hli]
 rst 
 ld d, l
 rst 
-ld a, [hl+]
+ld a, [hli]
 rst 
 ld d, l
 rst 
@@ -1316,7 +1327,7 @@ nop
 rst 
 dec d
 rst 
-ld a, [hl+]
+ld a, [hli]
 rst 
 dec d
 rst 
@@ -1549,7 +1560,7 @@ ld e, $1f
 jr nz, $00
 ld hl, $2223
 inc h
-ld [hl+], a
+ld [hli], a
 dec h
 ld e, $22
 dec h
@@ -1573,7 +1584,7 @@ nop
 nop 
 nop 
 ld bc, $2829
-ld a, [hl+]
+ld a, [hli]
 dec hl
 inc l
 dec l
@@ -1654,7 +1665,7 @@ nop
 nop 
 ld e, $3d
 ld a, $3f
-ld [hl+], a
+ld [hli], a
 daa 
 ld hl, $1f20
 ld hl, $2225

@@ -21,10 +21,6 @@ public class Operand {
                 || OPERAND_TYPE == OperandType.A8 
                 || OPERAND_TYPE == OperandType.A16 
                 || OPERAND_TYPE == OperandType.E8));
-                // && OPERAND_TYPE != OperandType.CC_C
-                // && OPERAND_TYPE != OperandType.CC_H
-                // && OPERAND_TYPE != OperandType.CC_NZ
-                // && OPERAND_TYPE != OperandType.CC_Z);
     }
 
     public int byteLength(){
@@ -73,7 +69,7 @@ public class Operand {
         } else if (!isData()) {
             str = OPERAND_TYPE.name().toLowerCase();
             if (INCREMENT) {
-                str += '+';
+                str += 'i';
             }
         } else {
             if (OPERAND_TYPE == OperandType.N8 || OPERAND_TYPE == OperandType.A8 || OPERAND_TYPE == OperandType.E8) { // to 8 bit values
